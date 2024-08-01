@@ -26,12 +26,19 @@ public class StagingZone extends SubsystemBase {
         backNoteSensor = new DigitalInput(backSensorChannel);
     }
 
-    public Command setArmPosition(double pos) {
-        return new PositionArm(this, pos);
+    public boolean getFrontSensor() {
+        return !frontNoteSensor.get();
+    }
+    public boolean getBackSensor() {
+        return !backNoteSensor.get();
     }
 
-    public void setStagingMotorSpeed(double speed) {
-        stagingMotor.set(speed);
+    public Command setStagingMotorSpeed(double speed) {
+        return runOnce(
+            () -> {
+                stagingMotor.set(speed);
+            }
+        );
     }
 
     public void setArmMotorSpeed(double speed) {

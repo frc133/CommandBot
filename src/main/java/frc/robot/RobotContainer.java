@@ -6,7 +6,10 @@ package frc.robot;
 
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.IntakeNote;
+import frc.robot.commands.PositionArm;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.StagingZone;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -22,7 +25,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-    private final StagingZone stagingZone = new StagingZone(10, 15);
+    private final StagingZone stagingZone = new StagingZone(10, 15, 8, 7);
+    private final Intake intake = new Intake(9);
 
     CommandXboxController primaryDriver = new CommandXboxController(0);
     CommandXboxController secondaryDriver = new CommandXboxController(1);
@@ -52,12 +56,14 @@ public class RobotContainer {
     private void configureBindings() {
         secondaryDriver.b().onTrue(stagingZone.setStagingMotorSpeed(-Constants.STAGING_MOTOR_SPEED));
         secondaryDriver.x().onTrue(stagingZone.setStagingMotorSpeed(Constants.STAGING_MOTOR_SPEED));
-        secondaryDriver.b().or(secondaryDriver.x()).onFalse(stagingZone.setStagingMotorSpeed(0));
+        secondaryDriver.y().onTrue(stagingZone.setStagingMotorSpeed(0));
 
-        secondaryDriver.povDown().onTrue(stagingZone.setArmPosition(Constants.ARM_STAGING_POSITION));
-        secondaryDriver.povRight().onTrue(stagingZone.setArmPosition(Constants.ARM_AMP_POSITION));
-        secondaryDriver.povUp().onTrue(stagingZone.setArmPosition(Constants.ARM_MAX_HEIGHT));
-        secondaryDriver.povLeft().onTrue(stagingZone.setArmPosition(Constants.ARM_TRAP_POSITION));
+        secondaryDriver.a().onTrue(new IntakeNote(intake, stagingZone));
+
+        secondaryDriver.povDown().onTrue(new PositionArm(stagingZone, Constants.ARM_STAGING_POSITION));
+        secondaryDriver.povRight().onTrue(new PositionArm(stagingZone, Constants.ARM_AMP_POSITION));
+        secondaryDriver.povUp().onTrue(new PositionArm(stagingZone, Constants.ARM_MAX_HEIGHT));
+        secondaryDriver.povLeft().onTrue(new PositionArm(stagingZone, Constants.ARM_TRAP_POSITION));
     }
 
     /**
